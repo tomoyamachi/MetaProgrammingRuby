@@ -1,0 +1,51 @@
+第2章 メソッド
+
+* 動的メソッド
+
+** 動的ディスパッチ obj.send()
+Object.send(:method_name, parameter)でコード実行時に呼び出すメソッドを決められる。
+
+** 動的メソッド obj.define_method()
+Module#define_method()を使うと、メソッドをその場で定義できる。
+
+* method_missing()のオーバーライド
+** 使用例
+class Lawyer
+  def method_missing(method, *args)
+    puts"#{method}(#{args})"
+    puts "block" if block_given?
+  end
+
+  bob = Lawyer.new
+  bob.test(3,4) do
+    "Sample block"
+  end
+end
+実行結果
+test([3,4])
+block
+
+このように、存在しないはずのメソッドが呼び出せる。
+これをゴーストメソッドと呼ぶ。
+
+** 起こりうる問題 メソッド名の衝突
+すでにあるメソッド名で呼び出すと、method_missing()で対応できない。
+解決するには
+Module#undef_method() => 継承したメソッドも含めた、すべてのメソッドを削除
+Module#remove_method() => レシーバのメソッドは削除するが、継承したメソッドは削除しない
+をつかう。
+
+
+class Computer
+  instance_methods.each do |m|
+    undef_method m unless m.to_s =~ /^__|object_id|method_missing|respond_to?/
+  end
+
+  def method_missing(method, *args)
+    puts "method missing"
+  end
+end
+c = Computer.new
+c.no_method
+実行結果
+"method missing"
