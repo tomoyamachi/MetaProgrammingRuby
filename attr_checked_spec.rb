@@ -34,17 +34,14 @@ describe Person do
 end
 
 def add_checked_attributes(clazz,attribute)
-  s = <<END
-    class #{clazz}
-      def #{attribute}=(value)
-        raise 'Invalid attribute' unless value
-        @#{attribute} = value
-      end
-
-      def #{attribute}()
-        @#{attribute}
-      end
+  clazz.class_eval do
+    define_method "#{attribute}=" do |value|
+      raise 'Invalid attribute' unless value
+      instance_variable_set("@#{attribute}", value)
     end
-END
-    eval s
+
+    define_method "#{attribute}" do
+      instance_variable_get "@#{attribute}"
+    end
+  end
 end

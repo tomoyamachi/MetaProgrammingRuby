@@ -581,8 +581,49 @@ SecurityError: Insecure operation - eval
 
 ** attr_checkeed()の実装 ステップ1
 
+class Person;end
+def add_checked_attributes(clazz,attribute)
+  eval <<END
+    class #{clazz}
+      def #{attribute}=(value)
+        raise 'Invalid attribute' unless value
+        @#{attribute} = value
+      end
+
+      def #{attribute}()
+        @#{attribute}
+      end
+    end
+END
+end
+
+describe Person do
+  before :each do
+    add_checked_attributes(Person, :age)
+    @p = Person.new
+  end
+
+  it "#age == 17 return true" do
+    @p.age = 15
+    lambda{ @p.age == 15 }.should be_true
+  end
+
+  it "#age = nil raise Error" do
+    lambda{ @p.age = nil }.should raise_error
+  end
+
+  it "#age = false raise Error" do
+    lambda{ @p.age = false }.should raise_error
+  end
+
+end
+
 
 ** attr_checkeed()の実装 ステップ2
+ステップ1のevalはコード文字列がふくまれている。
+将来のことを考え、コードインジェクションを防ぐため、リファクタリングしやすくするため、evalをなくす。
+
+
 ** attr_checkeed()の実装 ステップ3
 ** attr_checkeed()の実装 ステップ4
 ** attr_checkeed()の実装 ステップ5
