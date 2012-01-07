@@ -10,7 +10,7 @@ end
 
 describe Person do
   before :each do
-    add_checked_attributes(Person, :age)
+    add_checked_attributes(Person, :age) { |v| v <= 18}
     @p = Person.new
   end
 
@@ -19,9 +19,9 @@ describe Person do
     lambda{ @p.age == 15 }.should be_true
   end
 
-  # it "#age = 19 raise Error" do
-  #   lambda{ @p.age = 19 }.should raise_error
-  # end
+  it "#age = 19 raise Error" do
+    lambda{ @p.age = 19 }.should raise_error
+  end
 
   it "#age = nil raise Error" do
     lambda{ @p.age = nil }.should raise_error
@@ -33,10 +33,10 @@ describe Person do
 
 end
 
-def add_checked_attributes(clazz,attribute)
+def add_checked_attributes(clazz,attribute,&validation)
   clazz.class_eval do
     define_method "#{attribute}=" do |value|
-      raise 'Invalid attribute' unless value
+      raise 'Invalid attribute' unless validation.call(value)
       instance_variable_set("@#{attribute}", value)
     end
 

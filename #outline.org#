@@ -578,7 +578,6 @@ SecurityError: Insecure operation - eval
 
 汚染されたかどうかはObject#tainted?()で確認できる。
 
-
 ** attr_checkeed()の実装 ステップ1
 
 class Person;end
@@ -618,13 +617,25 @@ describe Person do
 
 end
 
-
-** attr_checkeed()の実装 ステップ2
+** attr_checkeed()の実装 ステップ2 evalの削除
 ステップ1のevalはコード文字列がふくまれている。
 将来のことを考え、コードインジェクションを防ぐため、リファクタリングしやすくするため、evalをなくす。
 
 
-** attr_checkeed()の実装 ステップ3
+def add_checked_attributes(clazz,attribute)
+  clazz.class_eval do
+    define_method "#{attribute}=" do |value|
+      raise 'Invalid attribute' unless value
+      instance_variable_set("@#{attribute}", value)
+    end
+
+    define_method "#{attribute}" do
+      instance_variable_get "@#{attribute}"
+    end
+  end
+end
+** attr_checkeed()の実装 ステップ3 ブロックの検証
+
 ** attr_checkeed()の実装 ステップ4
 ** attr_checkeed()の実装 ステップ5
 * 便利なTips
