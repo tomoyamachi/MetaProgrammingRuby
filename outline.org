@@ -578,7 +578,6 @@ SecurityError: Insecure operation - eval
 
 汚染されたかどうかはObject#tainted?()で確認できる。
 
-
 ** attr_checkeed()の実装 ステップ1
 
 class Person;end
@@ -618,13 +617,90 @@ describe Person do
 
 end
 
+** attr_checkeed()の実装 ステップ2 evalの削除
+ステップ1のevalはコード文字列がふくまれている。
+将来のことを考え、コードインジェクションを防ぐため、リファクタリングしやすくするため、evalをなくす。
 
-** attr_checkeed()の実装 ステップ2
 
+def add_checked_attributes(clazz,attribute)
+  clazz.class_eval do
+    define_method "#{attribute}=" do |value|
+      raise 'Invalid attribute' unless value
+      instance_variable_set("@#{attribute}", value)
+    end
 
-** attr_checkeed()の実装 ステップ3
-** attr_checkeed()の実装 ステップ4
-** attr_checkeed()の実装 ステップ5
+    define_method "#{attribute}" do
+      instance_variable_get "@#{attribute}"
+    end
+  end
+end
+** attr_checkeed()の実装 ステップ3 ブロックの検証
+** attr_checkeed()の実装 ステップ4 クラスマクロへ変更
+class Class
+この中へ押込む
+end
+** attr_checkeed()の実装 ステップ5 フックメソッドをつかって、モジュールとして追加
+*** フックメソッド 特定のイベントにフックをかける
+Rubyに用意されている、メソッドにイベントが発生したときに実行されるものがある
+たとえば Class#inherited()は、クラスが継承されたとき、
+Module#included()は、モジュールが読み込まれたときに実行される。
+
+これらは、デフォルトではなにもしないので、オープンクラスにしてオーバーライドする。
+
+module M
+  def self.included(othermod)
+    puts "M は #{othermod}にインクルードされた"
+  end
+end
+class C
+  include M
+end
+#=>M は Cにインクルードされた
+
+*** Moduleのメソッドをクラスメソッドとしてよみこむ
+1.フックメソッド included()を呼び出す
+2.フックメソッドで、インクルードする側のクラス(includer)をClassMethodsモジュールで拡張
+3.extend()メソッドで、includerの特異クラスにいるClassMethodsからメソッドをインクルードする
+
+module M
+  def self.included(base)
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def x
+      "x"
+    end
+  end
+end
+*** 実際のコード
+module CheckedAttributes
+  def self.included(base)
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def attr_checked(attribute, &validation)
+      define_method "#{attribute}=" do |value|
+        raise 'Invalid attribute' unless validation.call(value)
+        instance_variable_set("@#{attribute}", value)
+      end
+
+      define_method "#{attribute}" do
+        instance_variable_get "@#{attribute}"
+      end
+    end
+  end
+end
+
+class Person
+  include CheckedAttributes
+
+  attr_checked :age do |v|
+    v <= 18
+  end
+end
+
 * 便利なTips
 ***** irbでオブジェクトを追跡
 irb 上で、irb obj とすると、そのオブジェクトを追跡できる。
