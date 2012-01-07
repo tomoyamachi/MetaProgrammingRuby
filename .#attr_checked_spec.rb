@@ -1,1 +1,0 @@
-tomoya@ubuntu.ubuntu-domain.10460:1325648556
