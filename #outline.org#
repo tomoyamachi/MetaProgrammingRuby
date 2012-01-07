@@ -508,7 +508,7 @@ puts 4 + 3 ## 8
 
 * 第5章 コードを記述するコード
 
-** attr_checked()の実装
+** attr_checked()の実装 構想
 
 [[file:attr_checked_spec.rb]このコード]]を通すモジュール CheckedAttributesを考える。
 
@@ -519,7 +519,7 @@ puts 4 + 3 ## 8
 4.add_checked_attribute()をすべてのクラスで利用可能な attr_checked()という名前のクラスマクロに変更。
 5.フックを使って、attr_checked()を任意のクラスに追加するモジュールを書く。
 
-*** Kernel#eval 文字列を実行し、結果を返す
+** Kernel#eval 文字列を実行し、結果を返す
 eval("1+3") #=> 4
 
 
@@ -578,6 +578,14 @@ SecurityError: Insecure operation - eval
 
 汚染されたかどうかはObject#tainted?()で確認できる。
 
+
+** attr_checkeed()の実装 ステップ1
+
+
+** attr_checkeed()の実装 ステップ2
+** attr_checkeed()の実装 ステップ3
+** attr_checkeed()の実装 ステップ4
+** attr_checkeed()の実装 ステップ5
 * 便利なTips
 ***** irbでオブジェクトを追跡
 irb 上で、irb obj とすると、そのオブジェクトを追跡できる。

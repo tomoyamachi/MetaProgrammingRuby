@@ -33,5 +33,5 @@ describe Person do
 end
 
 def add_checked_attribute(clazz,attribute)
-
+  
 end
