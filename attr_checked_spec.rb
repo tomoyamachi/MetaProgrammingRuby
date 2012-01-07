@@ -10,6 +10,7 @@ end
 
 describe Person do
   before :each do
+    add_checked_attributes(Person, :age)
     @p = Person.new
   end
 
