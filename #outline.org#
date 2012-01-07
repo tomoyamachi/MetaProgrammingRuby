@@ -596,4 +596,4 @@ s = <<END
 END
 puts s
 #=> first sentence.
-    second sentence.
+second sentence.

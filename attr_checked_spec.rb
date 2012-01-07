@@ -3,9 +3,9 @@ require "rspec"
 class Person
 #  include CheckedAttributes
 
-  attr_checked :age do |v|
-    v >= 18
-  end
+  # attr_checked :age do |v|
+  #   v >= 18
+  # end
 end
 
 describe Person do
@@ -33,6 +33,18 @@ describe Person do
 
 end
 
-def add_checked_attribute(clazz,attribute)
+def add_checked_attributes(clazz,attribute)
+  s = <<END
+    class #{clazz}
+      def #{attribute}=(value)
+        raise 'Invalid attribute' unless value
+        @#{attribute} = value
+      end
 
+      def #{attribute}()
+        @#{attribute}
+      end
+    end
+END
+    eval s
 end
