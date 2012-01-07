@@ -635,8 +635,8 @@ def add_checked_attributes(clazz,attribute)
   end
 end
 ** attr_checkeed()の実装 ステップ3 ブロックの検証
+** attr_checkeed()の実装 ステップ4 クラスマクロへ変更
 
-** attr_checkeed()の実装 ステップ4
 ** attr_checkeed()の実装 ステップ5
 * 便利なTips
 ***** irbでオブジェクトを追跡

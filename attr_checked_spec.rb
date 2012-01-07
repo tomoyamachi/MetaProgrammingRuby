@@ -1,16 +1,29 @@
 require "rspec"
 #require"./check_attr"
+
+class Class
+  def attr_checked(attribute, &validation)
+    define_method "#{attribute}=" do |value|
+      raise 'Invalid attribute' unless validation.call(value)
+      instance_variable_set("@#{attribute}", value)
+    end
+
+    define_method "#{attribute}" do
+      instance_variable_get "@#{attribute}"
+    end
+  end
+end
+
 class Person
 #  include CheckedAttributes
 
-  # attr_checked :age do |v|
-  #   v >= 18
-  # end
+  attr_checked :age do |v|
+    v <= 18
+  end
 end
 
 describe Person do
   before :each do
-    add_checked_attributes(Person, :age) { |v| v <= 18}
     @p = Person.new
   end
 
@@ -31,17 +44,4 @@ describe Person do
     lambda{ @p.age = false }.should raise_error
   end
 
-end
-
-def add_checked_attributes(clazz,attribute,&validation)
-  clazz.class_eval do
-    define_method "#{attribute}=" do |value|
-      raise 'Invalid attribute' unless validation.call(value)
-      instance_variable_set("@#{attribute}", value)
-    end
-
-    define_method "#{attribute}" do
-      instance_variable_get "@#{attribute}"
-    end
-  end
 end
