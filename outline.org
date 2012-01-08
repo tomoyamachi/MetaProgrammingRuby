@@ -271,7 +271,7 @@ proc()
 特定のブロックを使いたい場合、yieldでは役不足になる。
 このとき、引数列の最後に、&の印のついた引数を置くことで解決できる。
 
-^他のメソッドにブロックを渡したい
+**** ^他のメソッドにブロックを渡したい
 def math(a,b)
   yield(a,b)
 end
@@ -282,7 +282,7 @@ end
 
 teach_math(2,3) { |x,y| x + y } #=> 5
 
-^ブロックをProcに変換したい
+**** ^ブロックをProcに変換したい
 def create_proc(&the_proc)
   the_proc
 end
