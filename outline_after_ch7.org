@@ -1,4 +1,4 @@
-* ActiveRecordの設計
+* 7章 ActiveRecordの設計
 今回のバージョンは2.3.2のもの。
 
 ** ActiveRecord::Base
@@ -136,3 +136,7 @@ save_without_validationが元のsaveになる
 :      end
 :    end
 がsaveとして呼び出せるようになる。
+* 8章 ActivoRecordの中身
+** ActiveRecordの動的属性の追加
+
+** ActiveRecord::method_mising()

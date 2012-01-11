@@ -188,3 +188,151 @@ class C
   end
 end
 C.new.attribute
+
+# 20 ミミックメソッド
+def BaseClass(name)
+  name == "string" ? String : Object
+end
+
+class A < BaseClass "string" # クラスにみえるメソッド
+  attr_accessor :an_attribute # キーワードにみえるメソッド
+end
+obj = A.new
+obj.an_attribute = 1 # 属性にみえるメソッド
+
+# 21 モンキーパッチ 既存クラスの振舞いを変更
+class String
+  def reverse
+    "override"
+  end
+end
+"abc".reverse
+
+# 22 名前付き引数
+def named_parameter(args)
+  args[:arg2]
+end
+named_parameter(:arg1 =>"A", :arg2 => "B")
+
+#23 ネームスペース 定数をモジュール内に定義
+module MyNamespace
+  class Array
+    def to_s
+      "#23 name space"
+    end
+  end
+end
+p Array.new.to_s
+p MyNamespace::Array.new.to_s
+
+#24 nilガード
+x = nil
+y = x || "nil guard"
+
+# 25 オブジェクト拡張 特異クラスにモジュールをインクルードして、特異メ
+# ソッドを定義
+
+obj = Object.new
+module M
+  def m_method
+    "#25 singleton"
+  end
+end
+class << obj
+  include M
+end
+obj.m_method
+
+#26 オープンクラス 既存のクラスを拡張
+class String
+  def my_string_method
+    "#26 open class"
+  end
+end
+p "abc".my_string_method
+
+#27 パターンディスパッチ 名前をもとにメソッドを呼び出す
+$x = "# 27"
+class P
+  def my_first
+    $x += " pattern"
+  end
+
+  def my_second
+    $x += " dispatch"
+  end
+end
+
+obj = P.new
+obj.methods.each { |m| obj.send(m) if m.to_s =~ /^my_/ }
+puts $x
+
+#28 サンドボックス 安全な場所をつくる $SAFEで管理
+def sandbox(&code)
+  proc {
+    $SAFE = 2
+    yield
+  }.call
+end
+
+sandbox { puts "#28 sandbox"}
+
+# 29 スケープゴート class,module.defで、スコープが切り替わる
+a = 1
+defined? a
+module MyModule
+  b = 1
+  defined? a
+end
+defined? a
+
+# 30 自己yield ブロックにself を渡す
+class Person
+  attr_accessor :name, :surname
+
+  def initialize
+    yield self
+  end
+end
+
+joe = Person.new do |p|
+  p.name = "#30"
+  p.surname = " self yield"
+end
+
+# 31 共有スコープ フラットスコープにし、変数を共有
+lambda{
+  shared = 10
+  self.class.class_eval do
+    define_method :counter do
+      shared
+    end
+
+    define_method :down do
+      shared -= 1
+    end
+  end
+}.call
+
+p counter
+3.times { down }
+p counter
+
+# 32 特異メソッド 特定のオブジェクトにメソッドを定義
+obj = "abc"
+
+class << obj
+  def my_singleton_method
+    "# 32 singleton method"
+  end
+end
+
+puts obj.my_singleton_method
+
+# 33 コード文字列
+string = "puts '#33 code string'"
+eval string
+
+# 34 Symbol の Proc変換 シンボルを1つのメソッドを呼び出すブロックに変
+# 換
+p [1,2,3,4].map(&:to_s)
